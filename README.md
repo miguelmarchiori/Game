@@ -85,6 +85,15 @@ Depois de editar, rode o teste — ele aponta mapa torto, gente flutuando, etc.
 - **Inimigos**: tabela `STATS` no topo de `scripts/enemy.gd` (visão, tempo de mira, velocidade da bala...).
 - **Câmera lenta**: constantes `SLOWMO_*` em `scripts/game.gd`.
 
+## Gerar o .exe (Windows)
+O `export_presets.cfg` já vem configurado (Windows e Linux, arquivo único).
+1. No Godot: **Editor → Gerenciar modelos de exportação → Baixar e instalar** (só na primeira vez).
+2. **Projeto → Exportar → Windows Desktop → Exportar projeto**. Sai um `prototipo_02.exe` em `build/windows/`.
+
+Pela linha de comando: `godot --headless --path . --export-release "Windows Desktop" build/windows/prototipo_02.exe`
+
+O Windows pode avisar "O Windows protegeu o computador" (o .exe não é assinado): **Mais informações → Executar assim mesmo**.
+
 ## Teste automático
 Valida os 5 mapas e simula: golpe, bala, rolamento, rebater bala, mira do atirador,
 câmera lenta, escalada dos poços, plataforma fina, abrir porta e concluir cada fase.

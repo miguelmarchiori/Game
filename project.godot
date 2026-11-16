@@ -1,10 +1,10 @@
 ; Engine configuration file.
-; Vanguard — protótipo 02 (ação com lâmina, estilo "um golpe mata")
+; Projeto — protótipo 02 (ação com lâmina, estilo "um golpe mata")
 config_version=5
 
 [application]
 
-config/name="Vanguard - Prototipo 02"
+config/name="Projeto - Prototipo 02"
 config/description="Plataforma de ação 2D: lâmina, câmera lenta e um golpe mata."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")

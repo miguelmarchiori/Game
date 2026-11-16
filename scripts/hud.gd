@@ -3,6 +3,10 @@ extends CanvasLayer
 ## telas de título / morte / fase concluída / pausa, mira e seta da saída.
 ## Tudo desenhado por código em um único Control (fácil de trocar depois).
 
+## Nome exibido na tela de título (provisório — troque quando o jogo tiver nome).
+const GAME_TITLE := "PROTÓTIPO 02"
+const GAME_SUBTITLE := "ação com lâmina  ·  um golpe mata"
+
 const C_TEXT := Color("#ece6d9")
 const C_DIM := Color(0.8, 0.78, 0.95, 0.6)
 const C_ACCENT := Color("#ff3d7f")
@@ -222,8 +226,8 @@ func _draw_title(size: Vector2) -> void:
 	var slash_k := clampf(_mode_t / 0.35, 0.0, 1.0)
 	var y := size.y * 0.36
 	_canvas.draw_line(Vector2(size.x * 0.15, y + 30), Vector2(lerpf(size.x * 0.15, size.x * 0.85, slash_k), y - 40 + 70 * (1.0 - slash_k)), Color(C_ACCENT, 0.8), 3.0)
-	_center_text(y, "VANGUARD", 96, C_TEXT)
-	_center_text(y + 44, "protótipo 02  ·  ação com lâmina  ·  um golpe mata", 18, C_DIM)
+	_center_text(y, GAME_TITLE, 96, C_TEXT)
+	_center_text(y + 44, GAME_SUBTITLE, 18, C_DIM)
 	if int(_t * 2.0) % 2 == 0 or _mode_t < 0.5:
 		_center_text(size.y * 0.6, "CLIQUE PARA JOGAR", 26, C_ACCENT)
 	var lines := [

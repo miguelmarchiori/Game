@@ -1,4 +1,6 @@
-# VANGUARD — Protótipo 02 (Godot 4)
+# Projeto — Protótipo 02 (Godot 4)
+
+> Nome do jogo ainda não definido — para trocar, mude `GAME_TITLE` em `scripts/hud.gd` e `config/name` no `project.godot`.
 
 Plataforma de ação 2D no estilo **"um golpe mata"**: lâmina na direção do mouse,
 rebater balas, câmera lenta, rolamento invencível e reinício instantâneo.

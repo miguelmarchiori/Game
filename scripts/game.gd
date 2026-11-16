@@ -1,6 +1,6 @@
 extends Node
 ## Autoload "Game" — controla o TEMPO do jogo (câmera lenta + hitstop),
-## tremida de câmera, camadas de física e estatísticas da sessão.
+## tremida de câmera, camadas de física e chaves globais do playground.
 ##
 ## Tudo que mexe em Engine.time_scale passa por aqui, para a câmera lenta
 ## e o "congelamento" de impacto (hitstop) não brigarem entre si.
@@ -8,29 +8,29 @@ extends Node
 signal slowmo_toggled(active: bool)
 
 # --- Camadas de física (bits) — iguais às de Projeto > Config. > Nomes de camadas ---
-const L_WORLD := 1      # camada 1: paredes/chão
+const L_WORLD := 1      # camada 1: paredes/chão/rampas
 const L_PLAYER := 2     # camada 2: jogador
 const L_ENEMY := 4      # camada 3: inimigos
-const L_BULLET := 8     # camada 4: balas (Area2D, para o golpe poder rebatê-las)
-const L_PLATFORM := 16  # camada 5: plataformas finas (atravessáveis por baixo)
+const L_BULLET := 8     # camada 4: balas (Area2D, para poderem ser rebatidas)
+const L_PLATFORM := 16  # camada 5: plataformas finas
+const L_ITEM := 32      # camada 6: armas soltas no chão
 const TILE := 32
 
 # --- Câmera lenta (bateria "FOCO") ---
-const SLOWMO_SCALE := 0.3            ## velocidade do mundo durante a câmera lenta
-const SLOWMO_DRAIN := 0.3            ## bateria gasta por segundo REAL (~3,3 s de uso)
+const SLOWMO_SCALE := 0.35           ## velocidade do mundo durante a câmera lenta
+const SLOWMO_DRAIN := 0.25           ## bateria gasta por segundo REAL (~4 s de uso)
 const SLOWMO_RECHARGE := 0.2         ## bateria recarregada por segundo real
-const SLOWMO_RECHARGE_DELAY := 0.6   ## espera antes de começar a recarregar
-const SLOWMO_MIN_START := 0.1        ## bateria mínima para ativar
-const SLOWMO_FADE := 8.0             ## rapidez da transição normal <-> lento
-const HITSTOP_SCALE := 0.03
+const SLOWMO_RECHARGE_DELAY := 0.6
+const SLOWMO_MIN_START := 0.1
+const SLOWMO_FADE := 8.0
+const HITSTOP_SCALE := 0.05
 
 var battery := 1.0
 var slowmo_active := false
 var slowmo_amount := 0.0          ## 0..1 suavizado (usado por efeitos visuais)
-var gameplay_active := false      ## main.gd liga durante a fase, desliga em menus/morte
-var god_mode := false             ## debug (F1)
-var deaths := 0
-var best_times := {}              ## índice da fase -> melhor tempo (s)
+var gameplay_active := false
+var god_mode := false             ## G: jogador não toma dano
+var ai_enabled := true            ## I: liga/desliga a IA dos inimigos
 
 var _need_release := false
 var _recharge_wait := 0.0
@@ -56,8 +56,7 @@ func _process(_delta: float) -> void:
 	if _hitstop_left > 0.0:
 		scale = HITSTOP_SCALE
 	Engine.time_scale = scale
-	# o som fica mais grave na câmera lenta (mas não "trava" no hitstop)
-	AudioServer.playback_speed_scale = lerpf(1.0, 0.65, slowmo_amount)
+	AudioServer.playback_speed_scale = lerpf(1.0, 0.7, slowmo_amount)
 
 
 func _update_slowmo(real_dt: float) -> void:
@@ -98,8 +97,7 @@ func shake(amount: float) -> void:
 	get_tree().call_group("camera", "add_shake", amount)
 
 
-## Chamado pelo main.gd a cada início/reinício de fase.
-func reset_for_level() -> void:
+func reset_time() -> void:
 	battery = 1.0
 	slowmo_active = false
 	slowmo_amount = 0.0

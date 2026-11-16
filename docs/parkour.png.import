@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://do5qhkrivysam"
-path="res://.godot/imported/06_camera_lenta.png-ea88251fd05c71c0f49f87a9cacf1e5d.ctex"
+uid="uid://xlvr0cevcdqp"
+path="res://.godot/imported/parkour.png-db7c9383b03d08f791f3c07d3b0a3fd5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/06_camera_lenta.png"
-dest_files=["res://.godot/imported/06_camera_lenta.png-ea88251fd05c71c0f49f87a9cacf1e5d.ctex"]
+source_file="res://docs/parkour.png"
+dest_files=["res://.godot/imported/parkour.png-db7c9383b03d08f791f3c07d3b0a3fd5.ctex"]
 
 [params]
 

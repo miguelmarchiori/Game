@@ -1,111 +1,134 @@
-# Projeto — Protótipo 02 (Godot 4)
+# Projeto — Protótipo 03: Playground (Godot 4)
 
 > Nome do jogo ainda não definido — para trocar, mude `GAME_TITLE` em `scripts/hud.gd` e `config/name` no `project.godot`.
 
-Plataforma de ação 2D no estilo **"um golpe mata"**: lâmina na direção do mouse,
-rebater balas, câmera lenta, rolamento invencível e reinício instantâneo.
-Tudo é desenhado por código (formas provisórias), então o projeto roda sem nenhum asset.
+Playground 2D de **luta corpo a corpo, armas e parkour**. Um único cenário (galpão industrial)
+dividido em 3 zonas — **PARKOUR**, **ARENA** e **RAMPAS** — onde você cria inimigos e armas na
+mira e testa à vontade. O personagem começa **de mãos livres**: soco, chute, gancho, voadora,
+rasteira... e pega armas do chão. Tudo desenhado por código (sem assets), com animação por
+"esqueleto" interpolado e interpolação de física (fica liso em monitor de 120/144 Hz).
 
-![título](docs/01_titulo.png)
-![golpe](docs/03_golpe.png)
-![câmera lenta](docs/06_camera_lenta.png)
+![playground](docs/playground.png)
+![combate](docs/combate.png)
+![armas](docs/armas.png)
+![parkour](docs/parkour.png)
 
-## Como abrir
-1. Instale o **Godot 4.3** ou superior (versão padrão, não precisa da .NET).
-2. No Project Manager: **Importar** → selecione o `project.godot` desta pasta.
-3. Aperte **F5** para jogar.
+## Como jogar
+- **Sem instalar nada:** baixe o `.exe` (Windows) que a equipe distribuir e abra.
+- **Pelo Godot 4.3+:** Importar → `project.godot` → **F5**.
 
 ## Controles
 | Ação | Tecla |
 |---|---|
-| Mover | A / D (ou setas) |
-| Pular (também na parede) | Espaço / W |
-| Golpe (na direção do mouse) | Clique esquerdo |
-| Rolamento invencível | S / Ctrl (no chão) |
-| Descer de plataforma fina | S parado em cima dela |
-| Mergulho rápido | S no ar |
-| Câmera lenta | Shift (segurar) |
-| Reiniciar fase | R |
-| Pausa | Esc |
-| Tela cheia | F11 |
+| Correr (segurar acelera até o sprint) | A / D |
+| Pular · pular de novo na parede | Espaço / W |
+| Dash (8 direções, 1 no ar, invencível) | Shift |
+| Deslizar (correndo) · agachar (parado) · mergulho (no ar) | S / Ctrl |
+| Atacar / atirar (na direção do mouse) | Clique esquerdo |
+| Chute frontal (empurra longe) | F |
+| Pegar / trocar arma | E |
+| Arremessar arma | Clique direito |
+| Câmera lenta (barra FOCO) | Q |
+| Renascer | R |
+| Pausa · tela cheia | Esc · F11 |
 
-**Atalhos de teste** (só rodando pelo editor): `F1` modo deus · `F2` mata todos · `F3` pula fase.
+### Playground
+| Tecla | Faz |
+|---|---|
+| 1 / 2 / 3 / 4 | cria Atirador / Escopeteiro / Brutamontes / Boneco **na mira** |
+| 5 / 6 / 7 / 8 / 9 / 0 / - | cria Pistola / Escopeta / Submetralhadora / Taco / Faca / Espada / Garrafa |
+| I | liga/desliga a IA (inimigos viram sacos de pancada) |
+| G | modo deus |
+| X · C | remove inimigos · remove armas |
+| Backspace | reseta o playground |
+| Tab · H | esconde a barra de spawn · mostra a ajuda |
 
 ## Mecânicas
-- **Um acerto mata** — você e os inimigos. Morreu? Clique ou `R` e volta na hora.
-- **Golpe**: dá um impulso na direção do mouse (inclusive para cima, 1x por pulo). Mata inimigos e **rebate balas**.
-- **Bala rebatida** fica ciano e mata inimigos.
-- **Rolamento**: invencível durante o giro (balas e golpes atravessam).
-- **Parede**: segure contra a parede para deslizar; pule para escalar.
-- **Câmera lenta (FOCO)**: a barra gasta enquanto segura Shift e recarrega sozinha.
-- **Inimigos**:
-  - *Atirador* — ao te ver, mira com um **laser**; nos últimos instantes a mira trava (hora de reagir) e ele atira.
-  - *Escopeta* — mira mais devagar, 5 projéteis de curto alcance.
-  - *Brutamontes* — corre até você, pisca branco (aviso) e golpeia.
-  - Patrulhando, só enxergam **na frente**. Matar um alerta os vizinhos.
-- A **saída** abre quando todos os inimigos morrem. Cronômetro e recorde por fase.
+**Parkour:** sprint que acelera · dash 8 direções · deslize que passa por vãos de 1 bloco e
+**acelera na descida das rampas** · pulo durante deslize/dash = pulo longo · **vault** automático
+em obstáculos baixos · **agarrar borda** e subir · pulo na parede · plataformas de salto ·
+plataformas finas (S parado em cima desce).
+
+**Combate desarmado:** clique = soco → soco → chute (combo) · mira para cima = gancho (lança o
+inimigo) · no ar = voadora na direção do mouse (e soco aéreo para malabarismo) · clique deslizando
+= rasteira · clique logo após o dash = soco investida · F = chute frontal.
+Inimigos ficam atordoados, caem, batem na parede (dano extra) e derrubam outros no caminho.
+Golpes no ar mantêm o inimigo no alto. Hitstop, tremida, números de dano e contador de combo.
+
+**Armas** (tabela em `scripts/weapons.gd`):
+
+| Arma | Tipo | Detalhe |
+|---|---|---|
+| Pistola | tiro | 12 balas, 2 tiros derrubam um atirador |
+| Escopeta | tiro | 7 projéteis; atirando no ar empurra você (pulo extra) |
+| Submetralhadora | tiro | automática, 30 balas |
+| Taco | corpo a corpo | empurra longe, derruba e **rebate balas** |
+| Faca | corpo a corpo | rápida; **arremessada mata** um atirador |
+| Espada | corpo a corpo | alcance longo, **rebate balas** |
+| Garrafa | corpo a corpo | atordoa muito e quebra no 1º golpe |
+
+Qualquer arma pode ser arremessada (botão direito) e machuca quem acertar. Inimigos largam a
+arma ao morrer. Sem munição? Arremesse.
+
+**Inimigos:** atirador (mira com laser — nos últimos instantes a mira trava, hora de desviar),
+escopeteiro (rajada curta), brutamontes (grandão com taco, aguenta mais e só cai com golpe forte)
+e boneco de treino (não morre, mostra o dano). Você tem 100 de vida, que regenera depois de 3 s
+sem apanhar.
 
 ## Estrutura
 ```
-project.godot          configuração, controles (Input Map) e camadas de física
-scenes/                main, player, enemy, bullet (.tscn com colisões)
+project.godot            controles, camadas de física, interpolação
+scenes/                  main, player, enemy, bullet
 scripts/
-  game.gd              autoload "Game": câmera lenta, hitstop, tremida, camadas
-  sfx.gd               autoload "Sfx": sons provisórios gerados por código
-  main.gd              fluxo: título → fase → morte/reinício → próxima fase
-  levels.gd            ★ DADOS DAS FASES (mapas em texto) — edite aqui
-  level.gd             transforma o mapa em colisão + cenário
-  player.gd            jogador (todos os números ajustáveis no Inspetor)
-  enemy.gd             inimigos (tabela STATS no topo para balancear)
-  bullet.gd            balas (raycast, podem ser rebatidas)
-  exit_door.gd         porta de saída
-  game_camera.gd       câmera (segue, olha para o mouse, treme)
-  hud.gd               interface e telas
-  fx.gd                efeitos: sangue, faíscas, arco do golpe, fantasmas
+  playground.gd          ★ O MAPA (texto) — edite aqui
+  main.gd                playground: spawn na mira, IA, limpar, renascer, combo
+  player.gd              jogador (números ajustáveis no Inspetor) + tabela MOVES dos golpes
+  enemy.gd               inimigos (tabela STATS no topo)
+  weapons.gd             tabela de armas + desenho
+  weapon_item.gd         arma solta no chão (física, arremesso)
+  rig.gd                 "esqueleto" com cinemática inversa usado nas animações
+  level.gd               transforma o mapa em colisão + cenário
+  jump_pad.gd, bullet.gd, game_camera.gd, hud.gd, fx.gd
+  game.gd                autoload: câmera lenta, hitstop, IA on/off, modo deus
+  sfx.gd                 autoload: sons provisórios gerados por código
 tests/
-  smoke_test.tscn      teste automático (mapas + mecânicas)
-  screenshots.tscn     gera capturas de tela
+  smoke_test.tscn        teste automático
+  screenshots.tscn       gera capturas de tela
 ```
 
-## Criando / editando fases
-Abra `scripts/levels.gd`. Cada fase é um mapa de texto, cada caractere = bloco de 32×32 px:
-
+## Editando o mapa
+`scripts/playground.gd` — cada caractere é um bloco de 32×32 px:
 ```
-#  parede            -  plataforma fina        P  jogador      D  saída
-g / G  atirador      s / S  escopeta           b / B  brutamontes
-(minúscula = olhando para a esquerda, MAIÚSCULA = para a direita)
+#  parede      -  plataforma fina      /  \  rampas      J  plataforma de salto
+P  jogador     g/G atirador   s/S escopeteiro   b/B brutamontes   d boneco
+1 pistola  2 escopeta  3 submetralhadora  4 taco  5 faca  6 espada  7 garrafa
 ```
+Regras (testadas): o pulo sobe ~3 blocos; vão de 1 bloco só passa deslizando; obstáculo de 1
+bloco o personagem pula sozinho correndo; até ~2,5 blocos ele agarra a borda.
 
-Regras práticas (já testadas): o pulo alcança **3 blocos** de altura; personagens e
-a porta precisam de chão logo abaixo; a borda do mapa deve ser toda `#`.
-Depois de editar, rode o teste — ele aponta mapa torto, gente flutuando, etc.
-
-## Ajuste fino (game feel)
-- **Jogador**: selecione `scenes/player.tscn` → Inspetor → grupos *Movimento, Parede, Rolamento, Golpe*.
-- **Inimigos**: tabela `STATS` no topo de `scripts/enemy.gd` (visão, tempo de mira, velocidade da bala...).
-- **Câmera lenta**: constantes `SLOWMO_*` em `scripts/game.gd`.
-
-## Gerar o .exe (Windows)
-O `export_presets.cfg` já vem configurado (Windows e Linux, arquivo único).
-1. No Godot: **Editor → Gerenciar modelos de exportação → Baixar e instalar** (só na primeira vez).
-2. **Projeto → Exportar → Windows Desktop → Exportar projeto**. Sai um `prototipo_02.exe` em `build/windows/`.
-
-Pela linha de comando: `godot --headless --path . --export-release "Windows Desktop" build/windows/prototipo_02.exe`
-
-O Windows pode avisar "O Windows protegeu o computador" (o .exe não é assinado): **Mais informações → Executar assim mesmo**.
+## Ajuste fino
+- **Movimento:** `scenes/player.tscn` → Inspetor → grupos *Corrida, Pulo, Parede, Dash, Deslize, Vida*.
+- **Golpes:** tabela `MOVES` no topo de `scripts/player.gd` (dano, duração, alcance, empurrão).
+- **Armas:** `scripts/weapons.gd`. **Inimigos:** `STATS` em `scripts/enemy.gd`.
 
 ## Teste automático
-Valida os 5 mapas e simula: golpe, bala, rolamento, rebater bala, mira do atirador,
-câmera lenta, escalada dos poços, plataforma fina, abrir porta e concluir cada fase.
+Valida o mapa e faz 45 checagens: combo, gancho, pegar/atirar, arremessar faca, taco
+rebatendo bala, dano/morte/renascimento, dash, deslize no túnel, vault, agarrar borda, escalar a
+torre, plataforma de salto, rampa, câmera lenta, spawn na mira, IA on/off e limpar.
 ```bash
 godot --headless --path . res://tests/smoke_test.tscn
 ```
-Termina com `RESULTADO: TUDO OK` (código de saída 0) ou lista as falhas.
+
+## Gerar o .exe (Windows)
+O `export_presets.cfg` já vem configurado (arquivo único).
+1. Godot: **Editor → Gerenciar modelos de exportação → Baixar e instalar** (1ª vez).
+2. **Projeto → Exportar → Windows Desktop → Exportar projeto**.
+
+Linha de comando: `godot --headless --path . --export-release "Windows Desktop" build/windows/prototipo_03.exe`
+
+O Windows pode avisar "O Windows protegeu o computador" (o .exe não é assinado): **Mais informações → Executar assim mesmo**.
 
 ## Próximos passos sugeridos
-**Arte** — trocar os desenhos de `_draw()` por sprites/animações (`AnimatedSprite2D`): correr, pular, golpe, rolar, morrer. Tileset para as paredes.
-**Áudio** — trocar os sons sintetizados (ver comentário no topo de `sfx.gd`) e adicionar música.
-**Programação** — objetos arremessáveis (botão direito), portas que se abrem com chute, inimigo com escudo, armadilhas (laser/torreta), salvar recordes em arquivo, menu de opções (volume, remapear teclas), suporte a controle.
-**Level design** — mais fases usando o formato de texto; testar com gente de fora da equipe e medir tempo/mortes.
-
-O protótipo 01 original continua no histórico do git (primeiro commit).
+- **Arte:** trocar o desenho do `rig.gd` por sprites/animações; tileset do galpão.
+- **Áudio:** sons reais (veja o topo de `sfx.gd`) e música.
+- **Gameplay:** agarrar/arremessar inimigos, contra-ataque (parry), corrida na parede, tirolesa, inimigos que pegam armas do chão, ondas de inimigos (modo arena), suporte a controle.

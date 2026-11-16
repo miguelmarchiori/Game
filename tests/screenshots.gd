@@ -1,13 +1,14 @@
 extends Node
-## Gera capturas de tela de várias situações do jogo (precisa de janela/GPU):
+## Gera capturas de tela de várias situações (precisa de janela/GPU):
 ##   godot --path . res://tests/screenshots.tscn -- <pasta_de_saida>
-## Útil para documentação e para revisar o visual sem jogar.
 
 const MAIN_SCENE := preload("res://scenes/main.tscn")
-const BULLET_SCENE := preload("res://scenes/bullet.tscn")
+const T := 32.0
+const FLOOR_Y := 28 * 32.0
 
 var out_dir := "user://screenshots"
 var main: Node
+var p: CharacterBody2D
 
 
 func _ready() -> void:
@@ -21,90 +22,146 @@ func _ready() -> void:
 	get_tree().quit()
 
 
-func wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds, true, false, true).timeout
+func wait(s: float) -> void:
+	await get_tree().create_timer(s, true, false, true).timeout
+
+
+func frames(n: int) -> void:
+	for i in n:
+		await get_tree().physics_frame
 
 
 func shot(file: String) -> void:
 	await RenderingServer.frame_post_draw
-	var img := get_viewport().get_texture().get_image()
-	img.save_png(out_dir.path_join(file))
+	get_viewport().get_texture().get_image().save_png(out_dir.path_join(file))
 	print("salvo ", file)
 
 
-func mouse_at_world(p: Vector2) -> void:
-	var screen := get_viewport().get_canvas_transform() * p
-	main.world.get_viewport().warp_mouse(screen)
-	Input.warp_mouse(screen)
+func place(pos: Vector2) -> void:
+	p = main.player
+	p.global_position = pos
+	p.reset_physics_interpolation()
+	main.camera.snap_to_target()
+	p.input_lock = 0.0
+
+
+func aim(at: Vector2) -> void:
+	p.use_aim_override = true
+	p.aim_override = at
+	Input.warp_mouse(get_viewport().get_canvas_transform() * at)
 
 
 func _shots() -> void:
-	await wait(0.6)
-	await shot("01_titulo.png")
-
-	main.start_level(0)
-	await wait(0.4)
-	Game.god_mode = true
-	await shot("02_fase1_inicio.png")
-	var p: CharacterBody2D = main.player
-	var e: Node2D = main.get_tree().get_nodes_in_group("enemies")[0]
-	p.global_position = e.global_position + Vector2(-60, 0)
-	e.patrols = false
-	await wait(0.3)
-	p.input_lock = 0.0
-	p.use_aim_override = true
-	p.aim_override = e.global_position + Vector2(0, -24)
-	p.start_attack()
-	await wait(0.03)
-	await shot("03_golpe.png")
 	await wait(0.8)
-	await shot("04_sangue.png")
+	await shot("01_inicio_ajuda.png")
+	main.show_help = false
+	Game.god_mode = true
+	Game.ai_enabled = false
 
-	main.start_level(1)
+	# combo no boneco
+	place(Vector2(33.0 * T, FLOOR_Y))
+	await wait(0.4)
+	var dummy: Node2D = get_tree().get_nodes_in_group("enemies").filter(func(e): return e.kind == 3)[0]
+	aim(dummy.global_position + Vector2(0, -30))
+	p._start_attack(true)
+	await wait(0.25)
+	p._start_attack(true)
+	await wait(0.25)
+	p._start_attack(true)
+	await frames(9)
+	await shot("02_chute_boneco.png")
+
+	# brutamontes + gancho
+	await wait(0.5)
+	var bru: Node2D = main.spawn_enemy("b", p.global_position + Vector2(44, 0), -1)
 	await wait(0.3)
-	p = main.player
-	var g: Node2D = null
-	for en in main.get_tree().get_nodes_in_group("enemies"):
-		if en.kind == 0:
-			g = en
-			break
-	g.patrols = false
-	p.global_position = g.global_position + Vector2(-330, 0)
-	for i in 120:
-		await get_tree().physics_frame
-		if g.state == g.State.AIM and g._t > 0.42:
-			break
-	await shot("05_laser_mira.png")
+	aim(p.global_position + Vector2(10, -300))
+	p._start_attack(true)
+	await frames(10)
+	await shot("03_gancho.png")
+
+	# voadora no ar
+	await wait(0.6)
+	var g: Node2D = main.spawn_enemy("g", p.global_position + Vector2(160, 0), -1)
+	await wait(0.3)
+	p.velocity.y = -600.0
+	await frames(14)
+	aim(g.center())
+	p._start_attack(false)
+	await frames(8)
+	await shot("04_voadora.png")
+
+	# escopeta
+	await wait(0.8)
+	main.clear_enemies()
+	place(Vector2(46.5 * T, FLOOR_Y))
+	p.weapon = "escopeta"
+	p.ammo = 6
+	var g2: Node2D = main.spawn_enemy("s", p.global_position + Vector2(200, 0), -1)
+	main.spawn_enemy("g", p.global_position + Vector2(260, 0), -1)
+	await wait(0.4)
+	aim(g2.center())
+	Input.action_press("attack")
+	await frames(3)
+	Input.action_release("attack")
+	await frames(3)
+	await shot("05_escopeta.png")
+
+	# taco
+	await wait(0.6)
+	p.weapon = "taco"
+	var b2: Node2D = main.spawn_enemy("g", p.global_position + Vector2(50, 0), -1)
+	await wait(0.3)
+	aim(b2.center())
+	p._start_attack(true)
+	await frames(9)
+	await shot("06_taco.png")
+
+	# deslize no túnel
+	await wait(0.5)
+	main.clear_enemies()
+	p.weapon = ""
+	place(Vector2(26.0 * T, FLOOR_Y))
 	await wait(0.2)
+	Input.action_press("move_left")
+	await frames(8)
+	Input.action_press("down")
+	await frames(16)
+	await shot("07_deslize_tunel.png")
+	Input.action_release("down")
+	Input.action_release("move_left")
+
+	# dash
+	await wait(0.8)
+	place(Vector2(40.0 * T, FLOOR_Y))
+	await wait(0.3)
+	Input.action_press("move_right")
+	Input.action_press("dash")
+	await frames(2)
+	Input.action_release("dash")
+	await frames(7)
+	await shot("08_dash.png")
+	Input.action_release("move_right")
+
+	# IA ligada: inimigos mirando
+	await wait(0.6)
+	Game.ai_enabled = true
+	place(Vector2(62.0 * T, FLOOR_Y))
+	main.spawn_enemy("g", Vector2(72.5 * T, 24 * T), -1)
+	main.spawn_enemy("s", Vector2(70.5 * T, 24 * T), -1)
+	await wait(1.1)
+	await shot("09_rampas_laser.png")
+
+	# câmera lenta
 	Input.action_press("slowmo")
 	await wait(0.5)
-	await shot("06_camera_lenta.png")
+	await shot("10_camera_lenta.png")
 	Input.action_release("slowmo")
-	await wait(0.5)
 
-	main.start_level(2)
-	Game.god_mode = true
-	await wait(0.2)
-	main.player.global_position = Vector2(20 * 32, 26 * 32)
-	await wait(0.7)
-	await shot("07_fase3_meio.png")
-
-	main.start_level(4)
-	await wait(0.6)
-	await shot("08_fase5.png")
-	Game.god_mode = false
-	var b := BULLET_SCENE.instantiate()
-	b.setup(main.player.center() + Vector2(220, 0), Vector2.LEFT, 700.0, 2.0, null)
-	main.world.add_child(b)
-	await wait(1.0)
-	await shot("09_morte.png")
-
-	main.start_level(0)
-	await wait(0.2)
-	for en in main.get_tree().get_nodes_in_group("enemies"):
-		en.die(Vector2.UP)
-	await wait(0.3)
-	await shot("10_saida_liberada.png")
-	main.player.global_position = main.door.global_position
-	await wait(0.8)
-	await shot("11_fase_concluida.png")
+	# torre de parkour
+	await wait(0.4)
+	Game.ai_enabled = false
+	place(Vector2(3.0 * T, 20 * T))
+	p.velocity = Vector2(-200, -300)
+	await frames(12)
+	await shot("11_torre_parkour.png")

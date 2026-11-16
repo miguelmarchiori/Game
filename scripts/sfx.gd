@@ -54,6 +54,22 @@ func _build_all() -> void:
 	_streams["slowmo_in"] = _wav(_tone(0.32, 700.0, 180.0, 0.25, "sine", 1.0))
 	_streams["slowmo_out"] = _wav(_tone(0.22, 180.0, 700.0, 0.2, "sine", 1.0))
 	_streams["ui"] = _wav(_tone(0.04, 880.0, 880.0, 0.2, "square", 1.0))
+	# --- luta corpo a corpo / parkour / armas ---
+	_streams["punch"] = _wav(_mix([_tone(0.08, 190.0, 85.0, 0.55, "sine", 2.0), _noise(0.06, 0.55, 3.0, 0.5, false)]))
+	_streams["kick"] = _wav(_mix([_tone(0.13, 150.0, 55.0, 0.7, "sine", 2.0), _noise(0.1, 0.6, 3.0, 0.32, false)]))
+	_streams["whoosh"] = _wav(_noise(0.13, 0.3, 0.0, 0.35, true, true))
+	_streams["dash"] = _wav(_mix([_noise(0.2, 0.45, 0.0, 0.5, true, true), _tone(0.14, 260.0, 900.0, 0.1, "sine", 1.0)]))
+	_streams["slide"] = _wav(_noise(0.38, 0.32, 0.0, 0.07, false, true))
+	_streams["vault"] = _wav(_noise(0.09, 0.3, 2.0, 0.2, false))
+	_streams["pickup"] = _wav(_concat([_tone(0.04, 620.0, 620.0, 0.18, "square", 1.0), _tone(0.06, 930.0, 930.0, 0.18, "square", 1.5)]))
+	_streams["throw"] = _wav(_noise(0.16, 0.4, 0.0, 0.45, true, true))
+	_streams["empty"] = _wav(_tone(0.03, 1300.0, 1300.0, 0.2, "square", 3.0))
+	_streams["smg"] = _wav(_mix([_noise(0.09, 0.55, 4.0, 0.5, false), _tone(0.06, 230.0, 90.0, 0.4, "sine", 2.0)]))
+	_streams["glass"] = _wav(_mix([_noise(0.28, 0.5, 3.0, 0.9, true), _tone(0.22, 3200.0, 3100.0, 0.14, "sine", 3.0), _tone(0.16, 4500.0, 4400.0, 0.1, "sine", 3.0)]))
+	_streams["pad"] = _wav(_tone(0.26, 170.0, 760.0, 0.32, "square", 1.5))
+	_streams["hurt"] = _wav(_tone(0.15, 320.0, 190.0, 0.28, "square", 1.5))
+	_streams["bat"] = _wav(_mix([_tone(0.12, 420.0, 210.0, 0.45, "sine", 3.0), _noise(0.08, 0.6, 4.0, 0.55, false)]))
+	_streams["splat"] = _wav(_mix([_tone(0.18, 110.0, 40.0, 0.8, "sine", 2.0), _noise(0.14, 0.7, 2.5, 0.25, false)]))
 
 
 ## Tom com glissando de f0 até f1. decay = expoente do envelope (0 = sem decaimento).
